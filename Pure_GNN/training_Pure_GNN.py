@@ -1,10 +1,10 @@
 from phase_model_pkg.tools.trainer import *
 from phase_model_pkg.tools.label_utils import cat_hetero, phase2aim, generate_indices, aim_transform, phase_transform
 from phase_model_pkg.tools.datasets import SoccerHeteroDataset
-from Pure_GNN_model import SoccerGNN
+from phase_model_pkg.Pure_GNN.Pure_GNN_model import SoccerGNN
 from phase_model_pkg.tools.losses import FocalLoss, BinaryFocalLoss
-from Filter import AimFilter, PhaseFilter
-from Fixer import PhaseFixer
+from phase_model_pkg.tools.Filter import AimFilter, PhaseFilter
+from phase_model_pkg.tools.Fixer import PhaseFixer
 
 warnings.filterwarnings('ignore')
 
@@ -199,7 +199,7 @@ for i, test_data in enumerate(data_list):
                 , early_stopping=early_stopping, y_key=1
                 )
     invade_model.load_state_dict(torch.load(
-        f'Invade_pure_transformer_demo_{match_team_list[i]}.pt'
+        f'Invade_pure_GNN_demo_{match_team_list[i]}.pt'
     ))
 
     Invade_pred_full, Invade_phases_full, Invade_f1_test, Invade_f1_test_each \

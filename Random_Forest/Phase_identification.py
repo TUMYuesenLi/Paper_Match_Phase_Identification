@@ -32,13 +32,13 @@ match_list = [
 ]
 match_team_list = [
     'BVB_FCA',
-    'DÜS_S04',
+    'S04_DÜS',
     'SVW_WOB',
 ]
 
-BVB_FCA_data = pd.read_csv(f'../Demo_Datasets/{match_list[0]}/Feature_demo_{match_team_list[0]}.csv')
-S04_DUS_data = pd.read_csv(f'../Demo_Datasets/{match_list[1]}/Feature_demo_{match_team_list[1]}.csv')
-SVW_WOB_data = pd.read_csv(f'../Demo_Datasets/{match_list[2]}/Feature_demo_{match_team_list[2]}.csv')
+BVB_FCA_data = pd.read_csv(f'../Demo_Datasets/{match_list[0]}/Feature_demo_{match_list[0]}.csv')
+S04_DUS_data = pd.read_csv(f'../Demo_Datasets/{match_list[1]}/Feature_demo_{match_list[1]}.csv')
+SVW_WOB_data = pd.read_csv(f'../Demo_Datasets/{match_list[2]}/Feature_demo_{match_list[2]}.csv')
 
 data_list = [
     BVB_FCA_data,

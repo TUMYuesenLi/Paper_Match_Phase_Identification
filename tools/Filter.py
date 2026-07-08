@@ -242,6 +242,33 @@ class PhaseFilter:
                 aim_new = aim
         return aim_new
 
+    def is_last_finishing_before_shot(self, df, start_index, end_index):
+        if 'Phase_pred_filtered_aim' not in df.columns:
+            return False
+
+        shot_positions = []
+        if 'Frames_to_Shot' in df.columns:
+            frames_to_shot = pd.to_numeric(df['Frames_to_Shot'], errors='coerce')
+            shot_positions.extend(df.index[frames_to_shot.eq(0)].tolist())
+        if 'Action' in df.columns:
+            shot_positions.extend(df.index[df['Action'].eq('ShotAtGoal')].tolist())
+
+        for shot_pos in sorted(set(shot_positions)):
+            i = min(int(shot_pos), len(df) - 1)
+            while i >= 0 and df.loc[i, 'Phase_pred_filtered_aim'] != 'Finishing':
+                i -= 1
+            if i < 0:
+                continue
+
+            finishing_end = i
+            while i - 1 >= 0 and df.loc[i - 1, 'Phase_pred_filtered_aim'] == 'Finishing':
+                i -= 1
+            finishing_start = i
+
+            if int(start_index) == finishing_start and int(end_index) == finishing_end:
+                return True
+        return False
+
     def filter(self, general_interval, finishing_interval):
         # data_drop = self.data.dropna(subset='Episode').reset_index(drop=True)
         data_drop = self.data.copy()
@@ -286,6 +313,8 @@ class PhaseFilter:
                         if phase != 'Finishing':
                             phase_new = self.find_most(episode_df_copy, phase, phase_length
                                                        , start_index, end_index, general_interval)
+                        elif self.is_last_finishing_before_shot(episode_df_copy, start_index, end_index):
+                            phase_new = phase
                         else:
                             phase_new = self.find_most(episode_df_copy, phase, phase_length
                                                        , start_index, end_index, finishing_interval)

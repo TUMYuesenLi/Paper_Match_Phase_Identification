@@ -1,7 +1,7 @@
 from phase_model_pkg.tools.trainer import *
 from phase_model_pkg.tools.label_utils import cat_hetero, phase2aim, generate_indices, aim_transform, phase_transform
 from phase_model_pkg.tools.datasets import SoccerHeteroDataset
-from T_GAN_model import SoccerGNNTransformer
+from phase_model_pkg.T_GAN.T_GAN_model import SoccerGNNTransformer
 from phase_model_pkg.tools.losses import FocalLoss, BinaryFocalLoss
 from phase_model_pkg.tools.Filter import AimFilter, PhaseFilter
 from phase_model_pkg.tools.Fixer import PhaseFixer
@@ -270,7 +270,6 @@ for i, test_data in enumerate(data_list):
     print('Data load complete')
 
     print('Start training')
-    # 训练过程zhou
     Scoring_model = SoccerGNNTransformer(
         node_dim=11,
         edge_dim=3,

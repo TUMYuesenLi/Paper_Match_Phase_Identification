@@ -1,10 +1,10 @@
 from phase_model_pkg.tools.trainer import *
 from phase_model_pkg.tools.label_utils import cat_hetero, phase2aim, generate_indices, aim_transform, phase_transform
 from phase_model_pkg.tools.datasets import SoccerHeteroDataset
-from Pure_Transformer import SoccerTransformer
+from phase_model_pkg.Pure_Transformer.Pure_Transformer import SoccerTransformer
 from phase_model_pkg.tools.losses import FocalLoss, BinaryFocalLoss
-from Filter import AimFilter, PhaseFilter
-from Fixer import PhaseFixer
+from phase_model_pkg.tools.Filter import AimFilter, PhaseFilter
+from phase_model_pkg.tools.Fixer import PhaseFixer
 
 warnings.filterwarnings('ignore')
 

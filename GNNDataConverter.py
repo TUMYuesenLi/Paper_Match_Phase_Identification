@@ -7,7 +7,7 @@ from tqdm import tqdm
 import itertools
 import re
 from typing import Optional
-from labeling_utils import *
+from phase_model_pkg.tools.label_utils import *
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import warnings
 warnings.filterwarnings('ignore')

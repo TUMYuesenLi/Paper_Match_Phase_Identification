@@ -11,6 +11,77 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+def boundaries_from_phase_ids(phase_ids, label_at='current', ignore_index=None):
+    phase = np.asarray(phase_ids)
+    length = len(phase)
+    y_hard = np.zeros(length, dtype=np.float32)
+    valid = np.ones(length, dtype=bool)
+
+    if length == 0:
+        return y_hard, valid
+    if label_at == 'current':
+        valid[-1] = False
+    elif label_at == 'next':
+        valid[0] = False
+    else:
+        raise ValueError("label_at must be 'current' or 'next'")
+
+    for idx in range(length - 1):
+        current, next_value = phase[idx], phase[idx + 1]
+        if ignore_index is not None and (current == ignore_index or next_value == ignore_index):
+            valid[idx if label_at == 'current' else idx + 1] = False
+            continue
+        if current != next_value:
+            y_hard[idx if label_at == 'current' else idx + 1] = 1.0
+
+    return y_hard, valid
+
+
+def _apply_window_max(dst, idx, val_fn, window):
+    start = max(0, idx - window)
+    end = min(len(dst), idx + window + 1)
+    positions = np.arange(start, end)
+    distances = np.abs(positions - idx)
+    dst[start:end] = np.maximum(dst[start:end], val_fn(distances).astype(dst.dtype))
+
+
+def soft_labels_from_boundaries(
+    y_hard,
+    window=5,
+    scheme='flat',
+    flat_value=0.5,
+    min_floor=0.0,
+    triangular_floor=0.0,
+    gaussian_sigma=2.0,
+):
+    y_soft = np.zeros(len(y_hard), dtype=np.float32)
+
+    if scheme == 'flat':
+        def val_fn(distances):
+            values = np.full_like(distances, fill_value=flat_value, dtype=np.float32)
+            values[distances == 0] = 1.0
+            return values
+    elif scheme == 'triangular':
+        def val_fn(distances):
+            values = 1.0 - (distances / (window + 1.0))
+            values = np.maximum(values, triangular_floor).astype(np.float32)
+            values[distances == 0] = 1.0
+            return values
+    elif scheme == 'gaussian':
+        def val_fn(distances):
+            values = np.exp(-0.5 * (distances / max(1e-6, gaussian_sigma)) ** 2)
+            return np.clip(values, 0.0, 1.0).astype(np.float32)
+    else:
+        raise ValueError("scheme must be one of: 'flat', 'triangular', 'gaussian'")
+
+    for boundary_idx in np.flatnonzero(np.asarray(y_hard) > 0.5):
+        _apply_window_max(y_soft, boundary_idx, val_fn=val_fn, window=window)
+
+    if min_floor > 0.0:
+        y_soft = np.maximum(y_soft, np.float32(min_floor))
+    return np.clip(y_soft, 0.0, 1.0)
+
+
 def cat_hetero(data_list):
     all_frames = []
     episode_offset = 0

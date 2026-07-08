@@ -4,7 +4,7 @@ from torch.nn.utils.rnn import pad_sequence
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from label_utils import pd_collate_fn
+from phase_model_pkg.tools.label_utils import pd_collate_fn
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -353,6 +353,113 @@ def test_model(model, test_dataset, device, y_key=0, sequence_level=False
 
     return all_preds, all_labels, f1, f1_each
         # , torch.cat(trans_out_list, dim=0)
+
+
+def _event_importance_df(event_importance_results, y_key):
+    global_offset = 0
+
+    all_global_event_id = []
+    all_event_importance = []
+
+    for info in event_importance_results:
+        event_idx = info["event_idx"]
+        event_imp = info["event_importance"]
+        T = info["T"]
+
+        if event_idx.numel() > 0:
+            all_global_event_id.append(event_idx + global_offset)
+            all_event_importance.append(event_imp)
+
+        global_offset += T
+
+    category = 'intention' if y_key == 0 else 'phase'
+    if not all_global_event_id:
+        return pd.DataFrame({
+            "global_event_id": [],
+            f"event_importance_{category}": [],
+        })
+
+    all_global_event_id = torch.cat(all_global_event_id, dim=0)
+    all_event_importance = torch.cat(all_event_importance, dim=0)
+
+    return pd.DataFrame({
+        "global_event_id": all_global_event_id.cpu().numpy(),
+        f"event_importance_{category}": all_event_importance.cpu().numpy(),
+    })
+
+
+def predict_model(model, test_dataset, device, y_key=0, sequence_level=False
+                  , traditional_features=False, counter_features=False
+                  , return_event_importance=False
+                  ):
+    model.to(device)
+    model.eval()
+    all_preds = []
+
+    with torch.no_grad():
+        batch_episodes = test_dataset.intervals
+        event_importance_results = []
+        for episode in batch_episodes:
+            if sequence_level:
+                if return_event_importance:
+                    logits, preds, transformer_out, _, _, attn, event_mask = model.predict_episode(
+                        episode, device, sequence_level=True,
+                        return_attn=True,
+                        counter_features=counter_features,
+                        traditional_features=traditional_features
+                    )
+                    A = attn[0]
+                    event_idx = (event_mask == 1).nonzero(as_tuple=False).squeeze(-1)
+                    if event_idx.numel() == 0:
+                        event_importance = torch.zeros((0,), device=A.device)
+                    else:
+                        event_importance = A[:, :, event_idx].mean(dim=1).mean(dim=0)
+                    event_importance_results.append({
+                        "event_idx": event_idx.detach().cpu(),
+                        "event_importance": event_importance.detach().cpu(),
+                        "T": int(attn.size(-1)),
+                    })
+                else:
+                    logits, preds, transformer_out, _, _ = model.predict_episode(
+                        episode, device, sequence_level=True,
+                        counter_features=counter_features,
+                        traditional_features=traditional_features
+                    )
+
+                all_preds.append(preds.cpu().numpy())
+
+            else:
+                if return_event_importance:
+                    logits, preds, transformer_out, _, _, attn, event_mask = model.predict_episode(
+                        episode, device,
+                        return_attn=True,
+                        counter_features=counter_features,
+                        traditional_features=traditional_features
+                    )
+                    A = attn[0]
+                    event_idx = (event_mask == 1).nonzero(as_tuple=False).squeeze(-1)
+                    if event_idx.numel() == 0:
+                        event_importance = torch.zeros((0,), device=A.device)
+                    else:
+                        event_importance = A[:, :, event_idx].mean(dim=1).mean(dim=0)
+                    event_importance_results.append({
+                        "event_idx": event_idx.detach().cpu(),
+                        "event_importance": event_importance.detach().cpu(),
+                        "T": int(attn.size(-1)),
+                    })
+                else:
+                    logits, preds, transformer_out, _, _ = model.predict_episode(
+                        episode, device,
+                        counter_features=counter_features,
+                        traditional_features=traditional_features
+                    )
+
+                all_preds.extend(preds.cpu().numpy())
+
+    if return_event_importance:
+        return all_preds, _event_importance_df(event_importance_results, y_key)
+
+    return all_preds
 
 
 def predict_node(model, test_dataset, device, y_key=0, sequence_level=False):

@@ -63,9 +63,9 @@ match_team_list = [
     'SVW_WOB',
 ]
 
-BVB_FCA_data = pd.read_csv(f'../Demo_Datasets/{match_list[0]}/Feature_demo_{match_team_list[0]}.csv')
-S04_DUS_data = pd.read_csv(f'../Demo_Datasets/{match_list[1]}/Feature_demo_{match_team_list[1]}.csv')
-SVW_WOB_data = pd.read_csv(f'../Demo_Datasets/{match_list[2]}/Feature_demo_{match_team_list[2]}.csv')
+BVB_FCA_data = pd.read_csv(f'../Demo_Datasets/{match_list[0]}/Feature_demo_{match_list[0]}.csv')
+S04_DUS_data = pd.read_csv(f'../Demo_Datasets/{match_list[1]}/Feature_demo_{match_list[1]}.csv')
+SVW_WOB_data = pd.read_csv(f'../Demo_Datasets/{match_list[2]}/Feature_demo_{match_list[2]}.csv')
 
 pred_data_list = [
     BVB_FCA_data
@@ -168,7 +168,7 @@ for i, pred_data in enumerate(pred_data_list):
     phase_fixer = PhaseFixer(phase_pred_data)
     phase_pred_data = phase_fixer.fix()
     phase_pred_data = generate_indices(phase_pred_data, 'Aim_filtered', 'Phase_pred_filtered_aim_filtered_fixed')
-    phase_pred_data.to_csv(f'Matchphases_{match_team_list[i]}_Phase_pred_rule-based_demp.csv')
+    phase_pred_data.to_csv(f'Matchphases_{match_team_list[i]}_Phase_pred_rule_based_demo.csv')
     # phase_pred_data = pred_data.merge(phase_pred_data, how='left')
     phase_pred_data['Episode_indices'] = phase_pred_data['Episode_indices'] + last_episode_index
     phase_pred_data['Phase_pred_filtered_aim_filtered_fixed_indices'] \
