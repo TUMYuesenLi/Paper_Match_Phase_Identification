@@ -209,13 +209,13 @@ The main prediction files contain frame-level and post-processed labels, includi
 If you use this code, please cite the associated manuscript:
 
 ```text
-Li, Y., Lang, S., Guennemann, S., & Link, D. Intention Driven Identification of In-Possession Match Phases in Association Football through Temporal Graph Learning.
+Li, Y., & Link, D. Intention Driven Identification of In-Possession Match Phases in Association Football through Temporal Graph Learning.
 ```
 
 Update this citation with the final journal information after publication.
 
 ## License and Data Availability
 
-Please add the final software license before public release.
+The source code is released under the MIT License. See `LICENSE` for details.
 
 The full original tracking/event data cannot be redistributed by the authors. Only processed example data are included to demonstrate the expected input format and code usage. Users who wish to reproduce the full study need access to the underlying match data and must follow the corresponding data provider's licensing terms.
