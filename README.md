@@ -87,6 +87,17 @@ When running scripts from the model subfolders, expose the parent project direct
 
 ## Quick Start
 
+### Download demo data
+
+If `Demo_Datasets/` is not included in the code package, download the processed example data with:
+
+```bash
+cd phase_model_pkg
+python download_demo_data.py --url "<anonymous-direct-download-url>"
+```
+
+Alternatively, set `MATCH_PHASE_DEMO_DATA_URL` and run `python download_demo_data.py`. To replace existing files, add `--overwrite`.
+
 ### 1. Convert CSV graph features to PyTorch Geometric data
 
 The demo package already includes `Hetero_demo_*.pt` files. To regenerate them from the CSV files:
@@ -209,13 +220,13 @@ The main prediction files contain frame-level and post-processed labels, includi
 If you use this code, please cite the associated manuscript:
 
 ```text
-Li, Y., & Link, D. Intention Driven Identification of In-Possession Match Phases in Association Football through Temporal Graph Learning.
+Anonymous. Intention Driven Identification of In-Possession Match Phases in Association Football through Temporal Graph Learning.
 ```
 
 Update this citation with the final journal information after publication.
 
 ## License and Data Availability
 
-The source code is released under the MIT License. See `LICENSE` for details.
+The source code is released under the MIT License for review. Copyright holder details are anonymized for double-blind review and should be restored after acceptance.
 
 The full original tracking/event data cannot be redistributed by the authors. Only processed example data are included to demonstrate the expected input format and code usage. Users who wish to reproduce the full study need access to the underlying match data and must follow the corresponding data provider's licensing terms.
