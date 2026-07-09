@@ -93,10 +93,10 @@ If `Demo_Datasets/` is not included in the code package, download the processed 
 
 ```bash
 cd phase_model_pkg
-python download_demo_data.py --url "<anonymous-direct-download-url>"
+python download_demo_data.py
 ```
 
-Alternatively, set `MATCH_PHASE_DEMO_DATA_URL` and run `python download_demo_data.py`. To replace existing files, add `--overwrite`.
+To replace existing files, add `--overwrite`.
 
 ### 1. Convert CSV graph features to PyTorch Geometric data
 
